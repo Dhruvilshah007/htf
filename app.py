@@ -72,5 +72,19 @@ def data():
         return render_template('data.html', name=name, rows=rows, titles=data.columns.values, length=length)
 
 
+@app.route('/download', methods=['GET', 'POST'])
+def download():
+
+    filename = 'result.xlsx'
+
+    excelDownload = open(filename, 'rb').read()
+
+    return Response(
+        excelDownload,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-disposition":
+                 "attachment; filename=result.xlsx"})
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=443, debug=True)
