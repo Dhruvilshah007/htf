@@ -716,3 +716,59 @@ def Demand_Planning(file, Annual_CB_demand):
     df2.to_excel('result.xlsx')
 
     return [df2, monthly_demand]
+
+
+def Allocation(df, alloc, MBR):
+
+    RA_MBR = {}
+    remaining_MBR = dict()
+
+    for i in alloc:
+        RA_MBR[i] = str(MBR[i]).split('.')[0]
+
+        if int(alloc[i]) >= int(RA_MBR[i]):
+            remaining_MBR[i] = 0
+        else:
+            remaining_MBR[i] = str(
+                int(RA_MBR[i]) - int(alloc[i])).split('.')[0]
+
+    data = {'Stakeholders': alloc.keys(), 'Allocation': alloc.values(
+    ), 'MBR': RA_MBR.values(), 'Remaining_MBR': remaining_MBR.values()}
+
+    df2 = pd.DataFrame(data)
+
+    for i in df2.index:
+        df2['Allocation'][i] = str(df2['Allocation'][i]).split('.')[0]
+
+    return df2
+
+
+def dashboard(file, df, remaining_plant_demand):
+
+    g_con = pd.read_excel(file, sheet_name='Grower_Constraints')
+    h_con = pd.read_excel(file, sheet_name='HIT_Constraints')
+    l_con = pd.read_excel(file, sheet_name='LLE_Constraints')
+    t_con = pd.read_excel(file, sheet_name='Transporter_Constraints')
+
+    total_growers = len(g_con)
+    total_hits = len(h_con)
+    total_lles = len(l_con)
+    total_trs = len(t_con)
+
+    total_cost = sum(list(map(int, (df['Total cost']))))
+
+    total_cost = str(total_cost).split('.')[0]
+    total_growers = str(total_growers).split('.')[0]
+    total_hits = str(total_hits).split('.')[0]
+    total_lles = str(total_lles).split('.')[0]
+    total_trs = str(total_trs).split('.')[0]
+
+    data = {'Growers': total_growers, 'HITs': total_hits, 'LLEs': total_lles, 'TRs': total_trs, 'Total cost': total_cost,
+            'Remaining Plant Demand': remaining_plant_demand}
+    df2 = pd.DataFrame(columns=['Growers', 'HITs', 'LLEs', 'TRs', 'Total cost',
+                       'Remaining Plant Demand'])
+    df2 = df2.append(data, ignore_index=True)
+
+    df2.to_excel('result.xlsx')
+
+    return df2
