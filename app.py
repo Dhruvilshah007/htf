@@ -72,6 +72,33 @@ def data():
         return render_template('data.html', name=name, rows=rows, titles=data.columns.values, length=length)
 
 
+@app.route('/ex_monthly_demand', methods=['GET', 'POST'])
+def data2():
+
+    global d
+
+    file = d['file']
+    data = d['data']
+    data = data.T
+
+    Plant_demand = int(data['Monthly Demand'][0])  # in cb terms
+
+    data = Route_Optimization(file, Plant_demand)
+    d['alloc'] = data[1]
+    d['MBR_stakeholders'] = data[2]
+    d['remaining_plant_demand'] = data[3]
+    data = data[0]
+    d['result_combinations'] = data
+
+    titles = data.columns.values
+    rows = [list(data[i].values) for i in titles]
+    rows = np.array(rows).T.tolist()
+    length = len(data)
+    name = 'monthly_demand'
+
+    return render_template('data.html', name=name, rows=rows, titles=data.columns.values, length=length)
+
+
 @app.route('/download', methods=['GET', 'POST'])
 def download():
 
